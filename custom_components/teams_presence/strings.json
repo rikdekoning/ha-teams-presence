@@ -1,0 +1,23 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Microsoft Teams Presence",
+        "description": "Sign in with your Microsoft 365 account to enable Teams presence tracking."
+      },
+      "device_code": {
+        "title": "Sign in to Microsoft 365",
+        "description": "{message}"
+      }
+    },
+    "error": {
+      "still_waiting": "Still waiting for sign-in. Please complete the sign-in in your browser and click Submit again.",
+      "auth_failed": "Authentication failed. Please try again."
+    },
+    "abort": {
+      "already_configured": "This Microsoft 365 account is already configured.",
+      "device_flow_failed": "Could not contact Microsoft to start sign-in. Check your internet connection.",
+      "auth_failed": "Sign-in failed or timed out. Please try again."
+    }
+  }
+}
