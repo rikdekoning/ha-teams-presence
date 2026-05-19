@@ -30,7 +30,7 @@ All sensors expose additional attributes such as the raw API value, color hint, 
 2. Go to **Integrations → ⋮ (three dots) → Custom Repositories**
 3. Enter the repository URL:
    ```
-   https://github.com/yourname/ha-teams-presence
+   https://github.com/rikdekoning/ha-teams-presence
    ```
    and set the category to **Integration**, then click **Add**
 4. Search for **Microsoft Teams Presence** in HACS and click **Download**
