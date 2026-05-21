@@ -8,9 +8,9 @@ Track your Microsoft Teams availability and activity as Home Assistant sensors, 
 
 | Sensor | Example states |
 |--------|---------------|
-| `sensor.{name}_teams_availability` | `available`, `busy`, `away`, `do_not_disturb`, `offline` |
-| `sensor.{name}_teams_activity` | `available`, `in_a_call`, `in_a_meeting`, `presenting`, `away` |
-| `sensor.{name}_teams_out_of_office` | `on` / `off` |
+| `sensor.teams_{name}_{name}_teams_availability` | `available`, `busy`, `away`, `do_not_disturb`, `offline` |
+| `sensor.teams_{name}_{name}_teams_activity` | `available`, `in_a_call`, `in_a_meeting`, `presenting`, `away` |
+| `sensor.teams_{name}_{name}_teams_out_of_office` | `on` / `off` |
 
 All sensors expose additional attributes such as the raw API value, color hint, user email, and (for out-of-office) the OOO message.
 
@@ -55,51 +55,94 @@ All sensors expose additional attributes such as the raw API value, color hint, 
 
 ## Automations
 
-### Turn on a red light when in a Teams call
+Replace `sensor.teams_your_name_your_name_teams_activity` with your actual entity ID, which you can find under **Settings -> Devices & Services -> Microsoft Teams Presence**.
+
+### Turn on a light when in Do Not Disturb
 
 ```yaml
-automation:
-  - alias: "DND light when in Teams call"
-    trigger:
-      - platform: state
-        entity_id: sensor.your_name_teams_activity
-        to: "in_a_call"
-    action:
-      - service: light.turn_on
-        target:
-          entity_id: light.office_dnd
-        data:
-          color_name: red
+alias: Teams DND - Turn on light
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - sensor.teams_your_name_your_name_teams_activity
+conditions:
+  - condition: state
+    entity_id: sensor.teams_your_name_your_name_teams_activity
+    state:
+      - do_not_disturb
+actions:
+  - action: light.turn_on
+    target:
+      entity_id: light.your_light
+    data: {}
+mode: single
 ```
 
-### Turn the light off when the call ends
+### Turn off the light when no longer in Do Not Disturb
 
 ```yaml
-automation:
-  - alias: "DND light off when Teams call ends"
-    trigger:
-      - platform: state
-        entity_id: sensor.your_name_teams_activity
-        from: "in_a_call"
-    action:
-      - service: light.turn_off
-        target:
-          entity_id: light.office_dnd
+alias: Teams DND - Turn off light
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - sensor.teams_your_name_your_name_teams_activity
+conditions:
+  - condition: not
+    conditions:
+      - condition: state
+        entity_id: sensor.teams_your_name_your_name_teams_activity
+        state:
+          - do_not_disturb
+actions:
+  - action: light.turn_off
+    target:
+      entity_id: light.your_light
+    data: {}
+mode: single
+```
+
+### Turn on a light when in a call or meeting
+
+```yaml
+alias: Teams - Light on when in call or meeting
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - sensor.teams_your_name_your_name_teams_activity
+conditions:
+  - condition: state
+    entity_id: sensor.teams_your_name_your_name_teams_activity
+    state:
+      - in_a_call
+      - in_a_conference_call
+      - in_a_meeting
+actions:
+  - action: light.turn_on
+    target:
+      entity_id: light.your_light
+    data: {}
+mode: single
 ```
 
 ### Notify when out of office is active
 
 ```yaml
-automation:
-  - alias: "Notify OOO status"
-    trigger:
-      - platform: state
-        entity_id: sensor.your_name_teams_out_of_office
-        to: "on"
-    action:
-      - service: notify.mobile_app
-        data:
-          message: "You are marked as Out of Office in Teams"
+alias: Teams - Notify when Out of Office
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - sensor.teams_your_name_your_name_teams_out_of_office
+    to: "on"
+conditions: []
+actions:
+  - action: notify.mobile_app_your_phone
+    data:
+      message: You are marked as Out of Office in Teams
+mode: single
 ```
 
 ---
@@ -171,6 +214,7 @@ To change the interval, edit `UPDATE_INTERVAL` in `const.py` before installing.
 | MFA prompt does not appear | Open the link in a private/incognito browser window |
 | Integration not found in HACS | Ensure the custom repository was added with category set to **Integration** |
 | Sensors disappear after a while | Your refresh token may have expired — remove and re-add the integration |
+| No states visible in automation editor | Wait 30 seconds for the sensor to poll and report its first value |
 
 ---
 
