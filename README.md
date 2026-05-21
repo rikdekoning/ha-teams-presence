@@ -27,7 +27,7 @@ All sensors expose additional attributes such as the raw API value, color hint, 
 ## Installation via HACS
 
 1. Open HACS in Home Assistant
-2. Go to **Integrations → ⋮ (three dots) → Custom Repositories**
+2. Go to **Integrations -> three dots menu -> Custom Repositories**
 3. Enter the repository URL:
    ```
    https://github.com/rikdekoning/ha-teams-presence
@@ -40,7 +40,7 @@ All sensors expose additional attributes such as the raw API value, color hint, 
 
 ## Setup
 
-1. Go to **Settings → Devices & Services → Add Integration**
+1. Go to **Settings -> Devices & Services -> Add Integration**
 2. Search for **Microsoft Teams Presence** and select it
 3. A screen will appear showing a short code and a URL:
    - Open [https://microsoft.com/devicelogin](https://microsoft.com/devicelogin) in your browser
@@ -142,12 +142,15 @@ automation:
 
 ## Privacy & permissions
 
-The integration requests only two scopes from Microsoft:
+The integration requests the following delegated scopes from Microsoft:
 
 - `Presence.Read` — read your own Teams presence status
+- `User.Read` — read your basic profile (display name and email, used to name the sensors)
 - `offline_access` — allow background token refresh without re-signing in
 
 No credentials are ever stored. Authentication uses Microsoft's Device Code flow — your password never touches Home Assistant. Tokens are saved securely in Home Assistant's config entry storage.
+
+No app registration is required — the integration uses the well-known Microsoft Graph Command Line Tools public client, so any Microsoft 365 user can sign in without needing Azure admin permissions.
 
 ---
 
@@ -163,9 +166,9 @@ To change the interval, edit `UPDATE_INTERVAL` in `const.py` before installing.
 
 | Problem | Fix |
 |---------|-----|
-| "Still waiting" after signing in | Wait 5–10 seconds and click Submit again |
+| "Still waiting" after signing in | Wait 5-10 seconds and click Submit again |
 | Sensor shows `unknown` | Check HA logs for Graph API errors; re-authenticate via the integration settings |
-| MFA prompt doesn't appear | Open the link in a private/incognito browser window |
+| MFA prompt does not appear | Open the link in a private/incognito browser window |
 | Integration not found in HACS | Ensure the custom repository was added with category set to **Integration** |
 | Sensors disappear after a while | Your refresh token may have expired — remove and re-add the integration |
 

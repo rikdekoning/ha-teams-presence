@@ -3,12 +3,10 @@
 DOMAIN = "teams_presence"
 PLATFORMS = ["sensor"]
 
-# Microsoft Azure CLI public client ID — a well-known stable public client
-# that supports device code flow without requiring app registration.
-# See: https://learn.microsoft.com/en-us/troubleshoot/azure/active-directory/verify-first-party-apps-sign-in
-CLIENT_ID = "04b07795-8ddb-461a-bbee-02f9e1bf7b46"  # Microsoft Azure CLI
+# Microsoft Graph Command Line Tools - well-known public client
+CLIENT_ID = "14d82eec-204b-4c2f-b7e8-296a70dab67e"
 AUTHORITY = "https://login.microsoftonline.com/common"
-SCOPES = ["https://graph.microsoft.com/Presence.Read", "offline_access"]
+SCOPES = ["https://graph.microsoft.com/Presence.Read", "https://graph.microsoft.com/User.Read", "offline_access"]
 
 # Graph API
 GRAPH_PRESENCE_URL = "https://graph.microsoft.com/v1.0/me/presence"
