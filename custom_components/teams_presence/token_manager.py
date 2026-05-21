@@ -40,12 +40,18 @@ class TokenManager:
             "client_id": CLIENT_ID,
             "scope": " ".join(SCOPES),
         }
-        async with aiohttp.ClientSession() as session:
-            async with session.post(DEVICE_CODE_URL, data=payload) as resp:
-                if resp.status != 200:
+        _LOGGER.debug("Initiating device code flow with client_id=%s scopes=%s", CLIENT_ID, SCOPES)
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.post(DEVICE_CODE_URL, data=payload, timeout=aiohttp.ClientTimeout(total=15)) as resp:
                     text = await resp.text()
-                    raise Exception(f"Failed to initiate device flow: {text}")
-                return await resp.json()
+                    _LOGGER.debug("Device code response status=%s body=%s", resp.status, text)
+                    if resp.status != 200:
+                        raise Exception(f"Microsoft returned HTTP {resp.status}: {text}")
+                    import json
+                    return json.loads(text)
+        except aiohttp.ClientError as err:
+            raise Exception(f"Network error contacting Microsoft: {err}") from err
 
     @staticmethod
     async def async_poll_for_token(device_code: str, interval: int = 5) -> dict[str, Any]:
@@ -55,12 +61,11 @@ class TokenManager:
             "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
             "device_code": device_code,
         }
-        # Poll for up to 15 minutes
         deadline = time.time() + 900
         async with aiohttp.ClientSession() as session:
             while time.time() < deadline:
                 await asyncio.sleep(interval)
-                async with session.post(TOKEN_URL, data=payload) as resp:
+                async with session.post(TOKEN_URL, data=payload, timeout=aiohttp.ClientTimeout(total=15)) as resp:
                     data = await resp.json()
                     error = data.get("error")
                     if error == "authorization_pending":
@@ -69,8 +74,8 @@ class TokenManager:
                         interval += 5
                         continue
                     elif error:
+                        _LOGGER.error("Token poll error: %s — %s", error, data.get("error_description", ""))
                         raise Exception(f"Device code polling error: {data.get('error_description', error)}")
-                    # Success
                     return data
         raise Exception("Device code flow timed out — user did not complete sign-in within 15 minutes")
 
@@ -79,7 +84,6 @@ class TokenManager:
         data = dict(self.entry.data)
         expiry = data.get(CONF_TOKEN_EXPIRY, 0)
 
-        # Refresh if within 5 minutes of expiry
         if time.time() < expiry - 300:
             return data[CONF_ACCESS_TOKEN]
 
@@ -91,7 +95,6 @@ class TokenManager:
             CONF_ACCESS_TOKEN: new_tokens["access_token"],
             CONF_TOKEN_EXPIRY: time.time() + new_tokens["expires_in"],
         }
-        # Refresh tokens rotate — save the new one if provided
         if "refresh_token" in new_tokens:
             updated[CONF_REFRESH_TOKEN] = new_tokens["refresh_token"]
 
@@ -108,9 +111,10 @@ class TokenManager:
             "scope": " ".join(SCOPES),
         }
         async with aiohttp.ClientSession() as session:
-            async with session.post(TOKEN_URL, data=payload) as resp:
+            async with session.post(TOKEN_URL, data=payload, timeout=aiohttp.ClientTimeout(total=15)) as resp:
                 data = await resp.json()
                 if "error" in data:
+                    _LOGGER.error("Token refresh error: %s — %s", data["error"], data.get("error_description", ""))
                     raise Exception(f"Token refresh failed: {data.get('error_description', data['error'])}")
                 return data
 

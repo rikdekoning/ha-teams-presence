@@ -3,17 +3,17 @@
 DOMAIN = "teams_presence"
 PLATFORMS = ["sensor"]
 
-# Microsoft identity platform
-# This is the well-known Microsoft Graph Explorer client ID (public client, no secret needed)
-# You can also register your own free app at portal.azure.com
-CLIENT_ID = "14d82eec-204b-4c2f-b7e8-296a70dab67e"  # Microsoft Graph Explorer public client ID
+# Microsoft Azure CLI public client ID — a well-known stable public client
+# that supports device code flow without requiring app registration.
+# See: https://learn.microsoft.com/en-us/troubleshoot/azure/active-directory/verify-first-party-apps-sign-in
+CLIENT_ID = "04b07795-8ddb-461a-bbee-02f9e1bf7b46"  # Microsoft Azure CLI
 AUTHORITY = "https://login.microsoftonline.com/common"
-SCOPES = ["Presence.Read", "offline_access"]
+SCOPES = ["https://graph.microsoft.com/Presence.Read", "offline_access"]
 
 # Graph API
 GRAPH_PRESENCE_URL = "https://graph.microsoft.com/v1.0/me/presence"
 
-# Polling interval in seconds (30s is a good balance; Teams updates ~every 5s but Graph has rate limits)
+# Polling interval in seconds
 UPDATE_INTERVAL = 30
 
 # Config entry keys
