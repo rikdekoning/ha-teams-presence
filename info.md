@@ -12,7 +12,7 @@ Track your Microsoft Teams availability and activity as Home Assistant sensors, 
 
 ## Setup
 
-1. Install via HACS using the repository URL: `https://github.com/yourname/ha-teams-presence`
+1. Install via HACS using the repository URL: `https://github.com/rikdekoning/ha-teams-presence`
 2. Restart Home Assistant
 3. Go to **Settings → Devices & Services → Add Integration** and search for **Microsoft Teams Presence**
 4. Open `https://microsoft.com/devicelogin` in your browser, enter the displayed code, and sign in with your Microsoft 365 account — MFA is fully supported
