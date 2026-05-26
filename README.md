@@ -193,7 +193,12 @@ The integration requests the following delegated scopes from Microsoft:
 
 No credentials are ever stored. Authentication uses Microsoft's Device Code flow — your password never touches Home Assistant. Tokens are saved securely in Home Assistant's config entry storage.
 
-No app registration is required — the integration uses the well-known Microsoft Graph Command Line Tools public client, so any Microsoft 365 user can sign in without needing Azure admin permissions.
+No app registration is required — the integration uses the well-known **Microsoft Graph Command Line Tools** public client (`14d82eec-204b-4c2f-b7e8-296a70dab67e`), the same app used by the Microsoft Graph PowerShell SDK.
+
+> **Important for corporate/work accounts:** In many organisations, the Microsoft Graph Command Line Tools app requires an administrator to grant tenant-wide consent before users can sign in. If you see an error during sign-in saying the app needs admin approval, ask your IT/Azure admin to grant consent for the app in your tenant. They can do this at:
+> `https://login.microsoftonline.com/{tenant-id}/adminconsent?client_id=14d82eec-204b-4c2f-b7e8-296a70dab67e`
+>
+> Personal Microsoft accounts (outlook.com, hotmail.com) are not affected by this restriction and can sign in without admin consent.
 
 ---
 
@@ -214,6 +219,7 @@ To change the interval, edit `UPDATE_INTERVAL` in `const.py` before installing.
 | MFA prompt does not appear | Open the link in a private/incognito browser window |
 | Integration not found in HACS | Ensure the custom repository was added with category set to **Integration** |
 | Sensors disappear after a while | Your refresh token may have expired — remove and re-add the integration |
+| Sign-in says app needs admin approval | Your IT admin needs to grant tenant consent for the Microsoft Graph Command Line Tools app — see Privacy & permissions section above |
 | No states visible in automation editor | Wait 30 seconds for the sensor to poll and report its first value |
 
 ---
